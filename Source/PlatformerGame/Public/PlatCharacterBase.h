@@ -19,11 +19,27 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	
+	// Health System
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+	float MaxHealth = 100.0f;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	float CurrentHealth;
+
+public:	
+	
+	// Health Functions
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	virtual void TakeDamage(float DamageAmount);
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	virtual void Die();
+
+	UFUNCTION(BlueprintPure, Category = "Health")
+	bool IsAlive() const { return CurrentHealth > 0.0f; }
+
+	UFUNCTION(BlueprintPure, Category = "Health")
+	float GetHealthPercent() const { return CurrentHealth / MaxHealth; }
 
 };

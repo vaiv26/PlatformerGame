@@ -3,11 +3,17 @@
 
 #include "PlatCharacterBase.h"
 
+#include "GameFramework/CharacterMovementComponent.h"
+
 // Sets default values
 APlatCharacterBase::APlatCharacterBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+
+
+	// Set default health
+	CurrentHealth = MaxHealth;
 
 }
 
@@ -18,17 +24,30 @@ void APlatCharacterBase::BeginPlay()
 	
 }
 
-// Called every frame
-void APlatCharacterBase::Tick(float DeltaTime)
+void APlatCharacterBase::TakeDamage(float DamageAmount)
 {
-	Super::Tick(DeltaTime);
+	UE_LOG(LogTemp, Warning, TEXT("APlayerBase::TakeDamage"));
+	if (!IsAlive()) return;
 
+	CurrentHealth = FMath::Clamp(CurrentHealth - DamageAmount, 0.0f, MaxHealth);
+
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("Enemy Health: %.0f"), CurrentHealth));
+	
+	if (CurrentHealth <= 0.0f)
+	{
+		Die();
+	}
 }
 
-// Called to bind functionality to input
-void APlatCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void APlatCharacterBase::Die()
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+        
+	// Disable character movement
+	GetCharacterMovement()->SetMovementMode(MOVE_None);
 
+	Destroy();
 }
+
 
